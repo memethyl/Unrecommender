@@ -13,18 +13,23 @@ $(window).on("load", function() {
 			if (mutation.type === "childList") {
 				var channels = $("div#feed > #feed-main-what_to_watch > ol").children("li");
 				for (var i = 0; i < channels.length; i+=1) {
+					var channel_text = channels.eq(i).find("span.shelf-annotation.shelf-title-annotation").text();
 					// these channels are always channels that you're not subscribed to
-					if (channels.eq(i).find("span.shelf-annotation.shelf-title-annotation").text() === "Recommended channel for you") {
+					if (channel_text === "Recommended channel for you" || channel_text === "Recommended videos for you") {
 						channels.eq(i).hide();
 					}
 					// these seem to be youtube's automatic channels like "Movies" and whatnot, from what i've seen
-					else if (new RegExp(/by .*/).test(channels.eq(i).find("span.shelf-annotation.shelf-title-annotation").text())) {
+					else if (new RegExp(/by .*/).test(channel_text)) {
 						channels.eq(i).hide();
 					}
 				}
 			}
 		});
 	});
+	// make sure we do the hostname/pathname test on first load as well
+	if (window.location.hostname === "www.youtube.com" && window.location.pathname === "/") {
+		homepage_observer_ol.observe($("div#feed > #feed-main-what_to_watch > ol").get(0), {childList: true});
+	}
 	// every loaded video after the first one (in the same tab)
 	$(window).on("spfdone", function() {
 		if (window.location.hostname === "www.youtube.com" && window.location.pathname === "/") {
@@ -46,12 +51,13 @@ $(window).on("load", function() {
 			if (mutation.type === "childList") {
 				var channels = $("ytd-two-column-browse-results-renderer > ytd-section-list-renderer > div#contents").children("ytd-item-section-renderer");
 				for (var i = 0; i < channels.length; i+=1) {
+					var channel_text = channels.eq(i).find("yt-formatted-string#title-annotation").text();
 					// these channels are always channels that you're not subscribed to
-					if (channels.eq(i).find("yt-formatted-string#title-annotation").text() === "Recommended channel for you") {
+					if (channel_text === "Recommended channel for you") {
 						channels.eq(i).hide();
 					}
 					// these seem to be youtube's automatic channels like "Movies" and whatnot, from what i've seen
-					else if (new RegExp(/by .*/).test(channels.eq(i).find("yt-formatted-string#title-annotation").text())) {
+					else if (new RegExp(/by .*/).test(channel_text)) {
 						channels.eq(i).hide();
 					}
 				}
@@ -82,25 +88,18 @@ function oldLayoutRecommends() {
 
 	// autoplay check
 	var rec_name = recommendations.eq(0).children().eq(0).children().eq(0).children().eq(2).text();
-	if (rec_name !== channel_name) {
-		var ap_button = $('autoplay-checkbox-label');
-		// this means autoplay is enabled; let's fix that
-		if (ap_button.children('.unchecked').offsetWidth === 0) {
-			ap_button.children('.toggle').click();
-		}
+	if (rec_name !== channel_name && $("div#watch7-sidebar-modules").children("div.watch-sidebar-section").length === 2) {
+		// note: if you can find an actual, tried and true way to disable autoplay here, i will love you forever
+
 		// hide the entire autoplay bit along with the separation line underneath it
 		$('.watch-sidebar-section').eq(0).hide();
 		$('.watch-sidebar-separation-line').eq(0).hide();
 		// hide the "next video" button next to the play button
 		$('.ytp-next-button').hide();
-		// hide the "up next" screen you get when the video ends
-		$("div.ytp-upnext.ytp-suggestion-set").hide();
 
 		console.log("Hid autoplay; name "+rec_name+" did not match channel name");
 	}
 
-	// weird shit involving playlists fucking up the sidebar; not sure why, let's fix that
-	$("div.watch-sidebar-section").show();
 	// when a playlist is being played, the first item on the sidebar is always a mix, so hide that
 	// the mix hiding code below doesn't do this because it assumes the mix is the SECOND item on the sidebar
 	// (and most of the time, it's right)
@@ -108,7 +107,7 @@ function oldLayoutRecommends() {
 		$("ul#watch-related").children().eq(0).hide();
 	}
 
-	// check next element to see if it's a mix
+	// check the recommendation directly below autoplay to see if it's a mix
 	// if yes, hide it cause fuck those
 	var mix_title = recommendations.eq(1).children().eq(0).children().eq(1).text();
 	var vid_title = $('#eow-title').attr('title');
