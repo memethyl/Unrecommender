@@ -1,8 +1,12 @@
 # Unrecommender
-A Chrome extension which blocks YouTube recommendations that don't come from the channel you're watching.
+An extension that filters YouTube recommendations based on your subscriptions and the channel you're watching.
 
 # Installation
-Until I can get this on the Chrome Web Store, you can install it by doing the following:
+You can get the Unrecommender on Chrome by going here:
+https://chrome.google.com/webstore/detail/unrecommender/ojejjpodljdngfmhbjfoplkckcekflae/
+
+# "But what if I want to install it unpacked?"
+You can install it as an unpacked extension by doing the following:
 1. Download the latest jQuery version - http://jquery.com/download/ (you'll want the compressed, production version)
 2. Download this repository (Clone or Download -> Download ZIP), then unzip it
 3. Move the compressed jQuery file you just downloaded into that folder
@@ -22,5 +26,12 @@ To help develop the Unrecommender, do the following:
 7. Start developing!
 Once you've finished doing what you wanted, [make a pull request!](https://github.com/memethyl/Unrecommender/pulls)
 
+# "What about other browsers?"
+The extension doesn't use any Chrome-specific APIs (yet), so it should work on at least Firefox and maybe even other browsers.
+I can't guarantee that, though, so if issues do arise, they (probably) aren't my fault. I'll look into it, though!
+
 # To-do
-- Add support for Firefox
+- Iron out the kinks with Firefox
+- Use subscriber list on video recommendations as well as the homepage
+- Add proper GUI
+- Optional blacklisting/whitelisting in the future?
