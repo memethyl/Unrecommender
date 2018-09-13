@@ -7,19 +7,18 @@ https://chrome.google.com/webstore/detail/unrecommender/ojejjpodljdngfmhbjfoplkc
 
 # "But what if I want to install it unpacked?"
 You can install it as an unpacked extension by doing the following:
-1. Download the latest jQuery version - http://jquery.com/download/ (you'll want the compressed, production version)
-2. Download this repository (Clone or Download -> Download ZIP), then unzip it
-3. Move the compressed jQuery file you just downloaded into that folder
-4. Go to `chrome://extensions/`
-5. Click "Load Unpacked..."
-6. Select the folder you just unzipped and hit "OK"
-(Only supports Google Chrome at the moment; other browsers will be supported later on!)
+1. Go to https://github.com/memethyl/Unrecommender/releases
+2. Download and extract the latest ZIP
+3. Go to `chrome://extensions`
+4. Click "Load Unpacked..."
+5. Select the Unrecommender folder you just unzipped and hit "OK"
+6. Enjoy!
 
 # Development
 To help develop the Unrecommender, do the following:
 1. Open your git shell and type `git clone https://github.com/memethyl/Unrecommender`
 2. Download the latest jQuery version - http://jquery.com/download/ (you'll want the compressed, production version)
-3. Copy that into your newly cloned repository
+3. Copy that into the "js" folder of your newly cloned repository
 4. Go to `chrome://extensions/`
 5. Click "Load Unpacked..."
 6. Select your repository folder and hit "OK"
