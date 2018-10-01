@@ -4,6 +4,7 @@ An extension that filters YouTube recommendations based on your subscriptions an
 # Installation
 You can get the Unrecommender on Chrome by going here:
 https://chrome.google.com/webstore/detail/unrecommender/ojejjpodljdngfmhbjfoplkckcekflae/
+
 You can also get it on Firefox by going here:
 https://addons.mozilla.org/en-US/firefox/addon/unrecommender/
 
