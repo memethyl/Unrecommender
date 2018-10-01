@@ -3,7 +3,7 @@
 
 	"name": "Unrecommender",
 	"description": "An extension that filters YouTube recommendations based on your subscriptions and the channel you're watching.",
-	"version": "2.0.0",
+	"version": "2.0.1",
 
 	"browser_action": {
 		"default_icon": {
@@ -18,7 +18,7 @@
 	"content_scripts": [
 		{
 			"matches": ["*://*.youtube.com/*"],
-			"run_at": "document_idle",
+			"run_at": "document_start",
 			"js": ["js/jquery-3.2.1.min.js", "js/main.js"]
 		}
 	],

@@ -111,7 +111,7 @@ class NewLayout {
 			$("#guide yt-icon-button#guide-button").click();
 		}
 		// youtube's new layout only shows a few subscriptions, so force the rest to show up
-		if ($("div#expandable-items").children().length === 0 ) {
+		if ($("div#expandable-items").children().length === 0) {
 			$("#expander-item").click();
 		}
 
@@ -120,14 +120,18 @@ class NewLayout {
 				if ($("div#expandable-items").children().length !== 0 || $("div#sections > :nth-child(3) > div#items").children().length <= 2) {
 					resolve("");
 				}
-			}, 50);
+			}, 10);
 		}).then((successMessage) => {
 			var subbed_channel_names = $("div#sections > :nth-child(3) > div#items").find("ytd-guide-entry-renderer:not(#expander-item):not(#collapser-item):not(:last-child)");
 			subbed_channel_names = subbed_channel_names.map(function() {return $.trim($(this).find("span.title").eq(0).text())}).get();
+			// for some reason, random subs will have periods after their names on the sidebar, so strip those
+			subbed_channel_names = $.map(subbed_channel_names, function(sub, i) {
+				return sub.replace(/(?<=.*) \./, "");
+			});
 			// worth noting that there's more than one "ytd-two-column-browse-results-renderer" in a youtube page,
 			// likely because of youtube's "never ever load a new page" philosophy,
 			// so just use the one that involves homepage recommendations
-			var listed_channel_elements = $("ytd-two-column-browse-results-renderer[page-subtype='home']").children("ytd-item-section-renderer");
+			var listed_channel_elements = $("ytd-two-column-browse-results-renderer[page-subtype='home']").find("ytd-item-section-renderer");
 			var listed_channel_names = listed_channel_elements.map(function() {
 				if ($(this).find("#title-annotation > a").length !== 0) {
 					return $.trim($(this).find("#title-annotation > a").text());
@@ -189,7 +193,7 @@ class NewLayout {
 		var rec_name = recommendations.eq(0).find("yt-formatted-string").text();
 		if (rec_name !== channel_name) {
 			recommendations.eq(0).hide();
-			$("ytp-next-button").hide();
+			$(".ytp-next-button").hide();
 			$("video").on("progress", function() {
 				if ($("#improved-toggle").attr("aria-pressed") === "true") {
 					$("#improved-toggle").click();
@@ -306,39 +310,20 @@ $(document).ready(function() {
 
 	/*-* NEW LAYOUT CODE STARTS HERE *-*/
 	if ($("body").attr("dir")) {
-		// make sure we do the pathname test on first load
-		switch (window.location.pathname) {
-			case "/":
-				new_layout.hideHomepageRecommends();
-				var homepage_observer_nl = new MutationObserver(function(mutationsList) {
-					mutationsList.forEach(function(mutation) {
-						if (mutation.type === "childList") {
-							new_layout.hideHomepageRecommends();
-						}
-					});
-				});
-				homepage_observer_nl.observe($("div#contents").get(0), {childList: true});
-			case "/feed/trending":
-				new_layout.hideTrendingRecommends();
-			default:
-				new_layout.hideRecommends();
-		}
+		// i DARE you to find a better event than this
+		// so far i have been unable to find any event that works this well
+		// without lagging so god damn much
 		$("ytd-app").on("yt-visibility-refresh", function() {
 			switch (window.location.pathname) {
 				case "/":
 					new_layout.hideHomepageRecommends();
-					var homepage_observer_nl = new MutationObserver(function(mutationsList) {
-						mutationsList.forEach(function(mutation) {
-							if (mutation.type === "childList") {
-								new_layout.hideHomepageRecommends();
-							}
-						});
-					});
-					homepage_observer_nl.observe($("div#contents").get(0), {childList: true});
+					break;
 				case "/feed/trending":
 					new_layout.hideTrendingRecommends();
+					break;
 				default:
 					new_layout.hideRecommends();
+					break;
 			}
 		});
 	}
