@@ -4,6 +4,8 @@ An extension that filters YouTube recommendations based on your subscriptions an
 # Installation
 You can get the Unrecommender on Chrome by going here:
 https://chrome.google.com/webstore/detail/unrecommender/ojejjpodljdngfmhbjfoplkckcekflae/
+You can also get it on Firefox by going here:
+https://addons.mozilla.org/en-US/firefox/addon/unrecommender/
 
 # "But what if I want to install it unpacked?"
 You can install it as an unpacked extension by doing the following:
@@ -26,11 +28,10 @@ To help develop the Unrecommender, do the following:
 Once you've finished doing what you wanted, [make a pull request!](https://github.com/memethyl/Unrecommender/pulls)
 
 # "What about other browsers?"
-The extension doesn't use any Chrome-specific APIs (yet), so it should work on at least Firefox and maybe even other browsers.
+The extension doesn't use any browser-specific APIs (yet), so it should work on browsers other than Chrome and Firefox.
 I can't guarantee that, though, so if issues do arise, they (probably) aren't my fault. I'll look into it, though!
 
 # To-do
-- Iron out the kinks with Firefox
 - Use subscriber list on video recommendations as well as the homepage
 - Add proper GUI
 - Optional blacklisting/whitelisting in the future?
