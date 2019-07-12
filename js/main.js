@@ -189,7 +189,12 @@ class NewLayout {
 		var channel_name = $("#owner-name > a").text();
 		var recommendations = $("div#related div#items > *");
 
-		// autoplay check
+		// autoplay prevention check
+		// In my testing, the control was not toggled off properly so it must include the block below
+		if ($("#toggle").attr("aria-pressed") === "true") {
+			$("#toggle").click();
+		}
+
 		var rec_name = recommendations.eq(0).find("yt-formatted-string").text();
 		if (rec_name !== channel_name) {
 			recommendations.eq(0).hide();
