@@ -10,6 +10,9 @@ class OldLayout {
 				listed_channel_elements.eq(i).hide();
 				console.log("Hid channel "+name+" as it was not on the subscription list");
 			}
+			else {
+				listed_channel_elements.eq(i).show();
+			}
 		});
 	}
 
@@ -58,6 +61,7 @@ class OldLayout {
 		// (and most of the time, it's right)
 		if ($("div#watch-appbar-playlist")) {
 			$("ul#watch-related").children().eq(0).hide();
+			$(".ytp-next-button").show();
 		}
 
 		// check the recommendation directly below autoplay to see if it's a mix
@@ -117,24 +121,25 @@ class NewLayout {
 
 		new Promise((resolve, reject) => {
 			setTimeout(function() {
-				if ($("div#expandable-items").children().length !== 0 || $("div#sections > :nth-child(3) > div#items").children().length <= 2) {
+				if ($("div#expandable-items").children().length !== 0 || $("div#sections > :nth-child(2) > div#items").children().length <= 2) {
 					resolve("");
 				}
 			}, 10);
 		}).then((successMessage) => {
-			var subbed_channel_names = $("div#sections > :nth-child(3) > div#items").find("ytd-guide-entry-renderer:not(#expander-item):not(#collapser-item):not(:last-child)");
+			var subbed_channel_names = $("div#sections > :nth-child(2) > div#items").find("ytd-guide-entry-renderer:not(#expander-item):not(#collapser-item):not(:last-child)");
 			subbed_channel_names = subbed_channel_names.map(function() {return $.trim($(this).find("span.title").eq(0).text())}).get();
 			// for some reason, random subs will have periods after their names on the sidebar, so strip those
 			subbed_channel_names = $.map(subbed_channel_names, function(sub, i) {
 				return sub.replace(/(?<=.*) \./, "");
 			});
+			subbed_channel_names.push("From your subscriptions");
 			// worth noting that there's more than one "ytd-two-column-browse-results-renderer" in a youtube page,
 			// likely because of youtube's "never ever load a new page" philosophy,
 			// so just use the one that involves homepage recommendations
 			var listed_channel_elements = $("ytd-two-column-browse-results-renderer[page-subtype='home']").find("ytd-item-section-renderer");
 			var listed_channel_names = listed_channel_elements.map(function() {
 				if ($(this).find("#title-annotation > a").length !== 0) {
-					return $.trim($(this).find("#title-annotation > a").text());
+					return $.trim($(this).find("#title-annotation > a").eq(0).text());
 				}
 				else {
 					return $.trim($(this).find("span#title").text());
@@ -144,6 +149,9 @@ class NewLayout {
 				if (!subbed_channel_names.includes(name) && listed_channel_elements.eq(i).css("display") !== "none") {
 					listed_channel_elements.eq(i).hide();
 					console.log("Hid channel "+name+" as it was not on the subscription list");
+				}
+				else if (subbed_channel_names.includes(name) && listed_channel_elements.eq(i).css("display") === "none") {
+					listed_channel_elements.eq(i).show();
 				}
 			});
 		});
@@ -310,9 +318,9 @@ $(document).ready(function() {
 
 	/*-* NEW LAYOUT CODE STARTS HERE *-*/
 	if ($("body").attr("dir")) {
-		// i DARE you to find a better event than this
-		// so far i have been unable to find any event that works this well
-		// without lagging so god damn much
+		// when you hit a "subscribe" button on a video,
+		// this element recommends you a bunch of other channels
+		$("#inline-recs-list-renderer").hide();
 		$("ytd-app").on("yt-visibility-refresh", function() {
 			switch (window.location.pathname) {
 				case "/":
