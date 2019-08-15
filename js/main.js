@@ -2,15 +2,16 @@ class OldLayout {
 	hideHomepageRecommends() {
 		var subbed_channel_names = $("ul#guide-channels").find("span.display-name").children("span");
 		subbed_channel_names = subbed_channel_names.map(function(){return $.trim($(this).text())}).get();
+		subbed_channel_names.push("From your subscriptions");
 		var listed_channel_elements = $("div#feed-main-what_to_watch > ol").children("li");
-		var listed_channel_names = $("div#feed-main-what_to_watch > ol").children("li").find("a:not([href*='/playlist']) span.branded-page-module-title-text, b > a.spf-link");
+		var listed_channel_names = $("div#feed-main-what_to_watch > ol").children("li").find("*:not([href*='/playlist']) span.branded-page-module-title-text, b > a.spf-link");
 		listed_channel_names = listed_channel_names.map(function(){return $.trim($(this).text())}).get();
 		listed_channel_names.forEach(function(name, i) {
 			if (!subbed_channel_names.includes(name) && listed_channel_elements.eq(i).css("display") !== "none") {
 				listed_channel_elements.eq(i).hide();
 				console.log("Hid channel "+name+" as it was not on the subscription list");
 			}
-			else {
+			else if (subbed_channel_names.includes(name) && listed_channel_elements.eq(i).css("display") === "none") {
 				listed_channel_elements.eq(i).show();
 			}
 		});
@@ -19,7 +20,7 @@ class OldLayout {
 	hideTrendingRecommends() {
 		var subbed_channel_names = $("ul#guide-channels").find("span.display-name").children("span");
 		subbed_channel_names = subbed_channel_names.map(function(){return $.trim($(this).text())}).get();
-		var trending_video_elements = $("li.expanded-shelf-content-item-wrapper");
+		var trending_video_elements = $("li.expanded-shelf-content-item-wrapper, li.yt-shelf-grid-item");
 		var trending_video_names = trending_video_elements.map(function() {
 			return $.trim($(this).find(".yt-lockup-byline a").text());
 		}).get();
@@ -29,6 +30,12 @@ class OldLayout {
 				console.log("Hid video from channel "+name+" as it was not on the subscription list");
 			}
 		});
+		var trending_video_sections = $("ol.section-list > li");
+		for (var i = 0; i < trending_video_sections.length; i++) {
+			if (trending_video_sections.eq(i).find("li.expanded-shelf-content-item-wrapper:visible, li.yt-shelf-grid-item:visible").length === 0) {
+				trending_video_sections.eq(i).hide();
+			}
+		}
 	}
 
 	hideRecommends() {
@@ -130,7 +137,7 @@ class NewLayout {
 			subbed_channel_names = subbed_channel_names.map(function() {return $.trim($(this).find("span.title").eq(0).text())}).get();
 			// for some reason, random subs will have periods after their names on the sidebar, so strip those
 			subbed_channel_names = $.map(subbed_channel_names, function(sub, i) {
-				return sub.replace(/(?<=.*) \./, "");
+				return sub.replace(/.*? \./, "");
 			});
 			subbed_channel_names.push("From your subscriptions");
 			// worth noting that there's more than one "ytd-two-column-browse-results-renderer" in a youtube page,
@@ -301,7 +308,7 @@ $(document).ready(function() {
 					if ($("div#feed > #feed-main-what_to_watch > ol:last-child")) {
 						resolve();
 					}
-				}, 50);
+				}, 10);
 			}).then((successMessage) => {
 				old_layout.hideHomepageRecommends();
 				homepage_observer_ol.observe($("div#feed > #feed-main-what_to_watch > ol").get(0), {childList: true});
