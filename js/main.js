@@ -162,7 +162,7 @@ class NewLayout {
 		if ($("div#expandable-items").children().length === 0) {
 			$("#expander-item").click();
 		}
-		var subbed_channel_names = $("div#sections > :nth-child(3) > div#items").find("ytd-guide-entry-renderer:not(#expander-item):not(#collapser-item):not(:last-child)");
+		var subbed_channel_names = $("div#sections > :nth-child(2) > div#items").find("ytd-guide-entry-renderer:not(#expander-item):not(#collapser-item):not(:last-child)");
 		subbed_channel_names = subbed_channel_names.map(function() {return $.trim($(this).find("span.title").eq(0).text())}).get();
 		var trending_video_elements = $("ytd-video-renderer, ytd-grid-video-renderer");
 		var trending_video_names = trending_video_elements.map(function() {
@@ -197,14 +197,19 @@ class NewLayout {
 		var channel_name = $("#owner-name > a").text();
 		var recommendations = $("div#related div#items > *");
 
-		// autoplay check
+		// autoplay prevention check
+		// In my testing, the control was not toggled off properly so it must include the block below
+		if ($("#toggle").attr("aria-pressed") === "true") {
+			$("#toggle").click();
+		}
+
 		var rec_name = recommendations.eq(0).find("yt-formatted-string").text();
 		if (rec_name !== channel_name) {
 			recommendations.eq(0).hide();
 			$(".ytp-next-button").hide();
 			$("video").on("progress", function() {
-				if ($("#improved-toggle").attr("aria-pressed") === "true") {
-					$("#improved-toggle").click();
+				if ($("#toggle").attr("aria-pressed") === "true") {
+					$("#toggle").click();
 				}
 			});
 		}
@@ -216,6 +221,10 @@ class NewLayout {
 		// (and most of the time, it's right)
 		if ($("ytd-playlist-panel-renderer").attr("hidden") !== "hidden") {
 			recommendations.eq(0).hide();
+			// Check for empty playlist that is still visible and remove the motherfucker
+			if($("ytd-playlist-panel-renderer").length){
+				$("ytd-playlist-panel-renderer").hide();
+			}
 		}
 
 		// check the recommendation directly below autoplay to see if it's a mix
