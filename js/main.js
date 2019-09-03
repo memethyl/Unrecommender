@@ -4,7 +4,7 @@ class OldLayout {
 		subbed_channel_names = subbed_channel_names.map(function(){return $.trim($(this).text())}).get();
 		subbed_channel_names.push("From your subscriptions");
 		var listed_channel_elements = $("div#feed-main-what_to_watch > ol").children("li");
-		var listed_channel_names = $("div#feed-main-what_to_watch > ol").children("li").find("*:not([href*='/playlist']) span.branded-page-module-title-text, b > a.spf-link");
+		var listed_channel_names = $("div#feed-main-what_to_watch > ol").children("li").find("h2:not(h2:has(b)) .branded-page-module-title-text, h2 > .branded-page-module-title-text, b > a.spf-link");
 		listed_channel_names = listed_channel_names.map(function(){return $.trim($(this).text())}).get();
 		listed_channel_names.forEach(function(name, i) {
 			if (!subbed_channel_names.includes(name) && listed_channel_elements.eq(i).css("display") !== "none") {
@@ -201,7 +201,7 @@ class NewLayout {
 	hideRecommends() {
 		$("#continuations > yt-next-continuation > paper-button").hide();
 
-		var channel_name = $("#owner-name > a").text();
+		var channel_name = $("#upload-info a").text();
 		var recommendations = $("div#related div#items > *");
 
 		// autoplay prevention check
@@ -210,7 +210,7 @@ class NewLayout {
 			$("#toggle").click();
 		}
 
-		var rec_name = recommendations.eq(0).find("yt-formatted-string").text();
+		var rec_name = recommendations.eq(0).find("yt-formatted-string#byline, yt-formatted-string.ytd-channel-name").text();
 		if (rec_name !== channel_name) {
 			recommendations.eq(0).hide();
 			$(".ytp-next-button").hide();
@@ -226,7 +226,7 @@ class NewLayout {
 		// when a playlist is being played, the first item on the sidebar is always a mix, so hide that
 		// the mix hiding code below doesn't do this because it assumes the mix is the SECOND item on the sidebar
 		// (and most of the time, it's right)
-		if ($("ytd-playlist-panel-renderer").attr("hidden") !== "hidden") {
+		if ($("ytd-playlist-panel-renderer").attr("hidden") !== "hidden" && !recommendations.eq(0).is("ytd-compact-autoplay-renderer")) {
 			recommendations.eq(0).hide();
 			// Check for empty playlist that is still visible and remove the motherfucker
 			if($("ytd-playlist-panel-renderer").length){
@@ -236,7 +236,7 @@ class NewLayout {
 
 		// check the recommendation directly below autoplay to see if it's a mix
 		// if yes, hide it cause fuck those
-		var mix_title = recommendations.eq(1).find("yt-formatted-string#byline").eq(0).text();
+		var mix_title = recommendations.eq(1).find("yt-formatted-string#byline, yt-formatted-string.ytd-channel-name").eq(0).text();
 		var vid_title = $("h1 > yt-formatted-string").text();
 		if (mix_title === "Mix - "+vid_title) {
 			recommendations.eq(1).hide();
@@ -246,9 +246,10 @@ class NewLayout {
 		var i = mix_title === 'Mix - '+vid_title ? 2 : 1;
 		for (i = i; i < recommendations.length; i+=1) {
 			// if recommendation name doesn't match channel name, hide the recommendation entirely
-			rec_name = recommendations.eq(i).find("yt-formatted-string#byline").text();
+			rec_name = recommendations.eq(i).find("yt-formatted-string#byline, yt-formatted-string.ytd-channel-name").text();
 			if (rec_name !== channel_name && recommendations.eq(i).css("display") !== "none") {
 				recommendations.eq(i).hide();
+				console.log("Hid element "+i+'; name '+rec_name+' did not match channel name');
 			}
 			// fyi: "rec_name === channel_name" returns false at first and doesn't return true until slightly later,
 			// because of youtube's horseshit dynamic loading
@@ -305,7 +306,7 @@ $(document).ready(function() {
 			});
 			new Promise((resolve, reject) => {
 				setTimeout(function() {
-					if ($("div#feed > #feed-main-what_to_watch > ol:last-child")) {
+					if ($("div#feed > #feed-main-what_to_watch > ol")) {
 						resolve();
 					}
 				}, 10);
@@ -323,6 +324,16 @@ $(document).ready(function() {
 		switch (window.location.pathname) {
 			case "/":
 				old_layout.hideHomepageRecommends();
+				new Promise((resolve, reject) => {
+					setTimeout(function() {
+						if ($("div#feed > #feed-main-what_to_watch > ol")) {
+							resolve();
+						}
+					}, 10);
+				}).then((successMessage) => {
+					old_layout.hideHomepageRecommends();
+					homepage_observer_ol.observe($("div#feed > #feed-main-what_to_watch > ol").get(0), {childList: true});
+				});
 			case "/feed/trending":
 				old_layout.hideTrendingRecommends();
 			case "/watch":

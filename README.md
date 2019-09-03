@@ -10,12 +10,20 @@ https://addons.mozilla.org/en-US/firefox/addon/unrecommender/
 
 # "But what if I want to install it unpacked?"
 You can install it as an unpacked extension by doing the following:
+### Chrome instructions:
 1. Go to https://github.com/memethyl/Unrecommender/releases
 2. Download and extract the latest ZIP
 3. Go to `chrome://extensions`
 4. Click "Load Unpacked..."
 5. Select the Unrecommender folder you just unzipped and hit "OK"
 6. Enjoy!
+### Firefox instructions:
+1. Go to https://github.com/memethyl/Unrecommender/releases
+2. Download and extract the latest ZIP
+3. Go to `about:debugging`
+4. Click "Load Temporary Add-on..."
+5. Go into the Unrecommender folder you just unzipped, select `manifest.json`, and hit "OK"
+6. Enjoy! (NOTE: Temporary add-ons will DISAPPEAR when Firefox is closed)
 
 # Development
 To help develop the Unrecommender, do the following:
