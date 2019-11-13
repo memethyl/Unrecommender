@@ -143,10 +143,10 @@ class NewLayout {
 			// worth noting that there's more than one "ytd-two-column-browse-results-renderer" in a youtube page,
 			// likely because of youtube's "never ever load a new page" philosophy,
 			// so just use the one that involves homepage recommendations
-			var listed_channel_elements = $("ytd-two-column-browse-results-renderer[page-subtype='home']").find("ytd-item-section-renderer");
+			var listed_channel_elements = $("ytd-two-column-browse-results-renderer[page-subtype='home']").find("ytd-item-section-renderer, ytd-rich-item-renderer");
 			var listed_channel_names = listed_channel_elements.map(function() {
-				if ($(this).find("#title-annotation > a").length !== 0) {
-					return $.trim($(this).find("#title-annotation > a").eq(0).text());
+				if ($(this).find("#title-annotation > a, yt-formatted-string.ytd-channel-name > a").length !== 0) {
+					return $.trim($(this).find("#title-annotation > a, yt-formatted-string.ytd-channel-name > a").eq(0).text());
 				}
 				else {
 					return $.trim($(this).find("span#title").text());
@@ -161,6 +161,9 @@ class NewLayout {
 					listed_channel_elements.eq(i).show();
 				}
 			});
+			// youtube changed their homepage layout recently,
+			// adding a "Free to watch" section with movies nobody cares about
+			$("ytd-rich-section-renderer:has(a[title='Free to watch'])").hide();
 		});
 	}
 
