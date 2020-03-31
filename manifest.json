@@ -13,7 +13,6 @@
 		"default_title": "Unrecommender"
 	},
 	"permissions": [
-		"*://*.youtube.com/*"
 	],
 	"content_scripts": [
 		{
