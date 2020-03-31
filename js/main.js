@@ -197,31 +197,39 @@ class NewLayout {
 		if ($("div#expandable-items").children().length === 0) {
 			$("#expander-item").click();
 		}
-		var subbed_channel_names = $("div#sections > :nth-child(2) > div#items").find("ytd-guide-entry-renderer:not(#expander-item):not(#collapser-item):not(:last-child)");
-		subbed_channel_names = subbed_channel_names.map(function() {return $.trim($(this).find("span.title").eq(0).text())}).get();
-		var trending_video_elements = $("ytd-video-renderer, ytd-grid-video-renderer");
-		var trending_video_names = trending_video_elements.map(function() {
-			if ($(this).find("a[href*='/channel']").length !== 0) {
-				return $.trim($(this).find("a[href*='/channel']").text());
-			}
-			else {
-				return $.trim($(this).find("a[href*='/user']").text());
-			}
-		}).get();
-		trending_video_names.forEach(function(name, i) {
-			if (!subbed_channel_names.includes(name) && trending_video_elements.eq(i).css("display") !== "none") {
-				trending_video_elements.eq(i).hide();
-				console.log("Hid video from channel "+name+" as it was not on the subscription list");
+
+		new Promise((resolve, reject) => {
+			setTimeout(function() {
+				if ($("div#expandable-items").children().length !== 0 || $("div#sections > :nth-child(2) > div#items").children().length <= 2) {
+					resolve("");
+				}
+			}, 10);
+		}).then((successMessage) => {
+			var subbed_channel_names = this.getSubbedChannels();
+			var trending_video_elements = $("ytd-video-renderer, ytd-grid-video-renderer");
+			var trending_video_names = trending_video_elements.map(function() {
+				if ($(this).find("a[href*='/channel']").length !== 0) {
+					return $.trim($(this).find("a[href*='/channel']")[0].innerText);
+				}
+				else {
+					return $.trim($(this).find("a[href*='/user']")[0].innerText);
+				}
+			}).get();
+			trending_video_names.forEach(function(name, i) {
+				if (!subbed_channel_names.includes(name) && trending_video_elements.eq(i).css("display") !== "none") {
+					trending_video_elements.eq(i).hide();
+					console.log("Hid video from channel "+name+" as it was not on the subscription list");
+				}
+			});
+			// certain parts of the trending page are contained in their own sections instead of being individual videos,
+			// so if we've hidden all the videos in a particular section, we'll hide the section as well
+			var trending_video_sections = $("ytd-item-section-renderer");
+			for (var i = 0; i < trending_video_sections.length; i++) {
+				if (trending_video_sections.eq(i).find("ytd-video-renderer:visible, ytd-grid-video-renderer:visible").length === 0) {
+					trending_video_sections.eq(i).hide();
+				}
 			}
 		});
-		// certain parts of the trending page are contained in their own sections instead of being individual videos,
-		// so if we've hidden all the videos in a particular section, we'll hide the section as well
-		var trending_video_sections = $("ytd-item-section-renderer");
-		for (var i = 0; i < trending_video_sections.length; i++) {
-			if (trending_video_sections.eq(i).find("ytd-video-renderer:visible, ytd-grid-video-renderer:visible").length === 0) {
-				trending_video_sections.eq(i).hide();
-			}
-		}
 	}
 	
 	// worth noting that because of the horseshit dynamic loading that youtube's new layout loves abusing,
