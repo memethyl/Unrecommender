@@ -116,11 +116,41 @@ class OldLayout {
 }
 
 class NewLayout {
-	hideHomepageRecommends() {
-		// in case the sub list isn't in the DOM yet
-		if (!$("#guide[opened]")) {
-			$("#guide yt-icon-button#guide-button").click();
+	getSubbedChannels() {
+		var subbed_channel_names = [];
+		var ytInitialGuideData = $("script:contains('var ytInitialGuideData')");
+		if (ytInitialGuideData.length !== 0) {
+			// neat trick, but i'm not sure if it works in all cases...
+			ytInitialGuideData = JSON.parse(ytInitialGuideData[0].innerText.match(/ytInitialGuideData = (.+);/)[1]);
+			subbed_channel_names = ytInitialGuideData["items"][1]["guideSubscriptionsSectionRenderer"]["items"].map((x) => {
+				try {
+					return x["guideEntryRenderer"]["title"];
+				} catch (e) {
+					if (e instanceof TypeError);
+					else throw e;
+				}
+			}).concat(ytInitialGuideData["items"][1]["guideSubscriptionsSectionRenderer"]["items"][ytInitialGuideData["items"][1]["guideSubscriptionsSectionRenderer"]["items"].length - 1]["guideCollapsibleEntryRenderer"]["expandableItems"].map((x) => {
+				return x["guideEntryRenderer"]["title"];
+			})).filter((x)=>{return (x !== undefined && x !== "Browse channels")});
 		}
+		else {
+			// ...so fall back to the old method if those cases ever come up
+			if (!document.getElementById("sections")) {
+				var event = new Event("mouseenter");
+				document.getElementById("guide-button").dispatchEvent(event);
+			}
+			subbed_channel_names = $("div#sections > :nth-child(2) > div#items ytd-guide-entry-renderer:not(#expander-item):not(#collapser-item):not(:last-child)");
+			subbed_channel_names = subbed_channel_names.map(function() {return $.trim($(this).find("yt-formatted-string").eq(0).text())}).get();
+			// for some reason, random subs will have periods after their names on the sidebar, so strip those
+			subbed_channel_names = $.map(subbed_channel_names, function(sub, i) {
+				return sub.replace(/(.*?) \./, "$1");
+			});
+		}
+		subbed_channel_names.push("From your subscriptions");
+		return subbed_channel_names;
+	}
+
+	hideHomepageRecommends() {
 		// youtube's new layout only shows a few subscriptions, so force the rest to show up
 		if ($("div#expandable-items").children().length === 0) {
 			$("#expander-item").click();
@@ -133,13 +163,7 @@ class NewLayout {
 				}
 			}, 10);
 		}).then((successMessage) => {
-			var subbed_channel_names = $("div#sections > :nth-child(2) > div#items").find("ytd-guide-entry-renderer:not(#expander-item):not(#collapser-item):not(:last-child)");
-			subbed_channel_names = subbed_channel_names.map(function() {return $.trim($(this).find("yt-formatted-string").eq(0).text())}).get();
-			// for some reason, random subs will have periods after their names on the sidebar, so strip those
-			subbed_channel_names = $.map(subbed_channel_names, function(sub, i) {
-				return sub.replace(/.*? \./, "");
-			});
-			subbed_channel_names.push("From your subscriptions");
+			var subbed_channel_names = this.getSubbedChannels();
 			// worth noting that there's more than one "ytd-two-column-browse-results-renderer" in a youtube page,
 			// likely because of youtube's "never ever load a new page" philosophy,
 			// so just use the one that involves homepage recommendations
