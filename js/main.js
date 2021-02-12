@@ -211,6 +211,9 @@ class NewLayout {
 				if ($(this).find("a[href*='/channel']").length !== 0) {
 					return $.trim($(this).find("a[href*='/channel']")[0].innerText);
 				}
+				else if ($(this).find("a[href*='/c/']").length !== 0) {
+					return $.trim($(this).find("a[href*='/c/']")[0].innerText);
+				}
 				else {
 					return $.trim($(this).find("a[href*='/user']")[0].innerText);
 				}
@@ -238,7 +241,7 @@ class NewLayout {
 		$("#continuations > yt-next-continuation > paper-button").hide();
 
 		var channel_name = $("#upload-info a").text();
-		var recommendations = $("div#related div#items > *");
+		var recommendations = $("div#related div#items div#contents > *");
 
 		// autoplay prevention check
 		// In my testing, the control was not toggled off properly so it must include the block below
